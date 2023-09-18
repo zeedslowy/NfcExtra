@@ -58,6 +58,7 @@ tNFC_STATUS hook_NFC_SetConfig(uint8_t tlv_size, uint8_t *p_param_tlvs) {
 
 tNFA_STATUS hook_NFA_Enable(void *p_dm_cback, void *p_conn_cback) {
     globals.hNFA_Enable->precall();
+    LOGD("hook_NFA_Enable()");
 
     std::lock_guard<std::mutex> lock(globals.nfaConnCBackMutex);
     LOGD("hook_NFA_Enable: Hooking p_conn_cback");
@@ -171,8 +172,8 @@ bool HookGlobals::checkNFACBOffset(uint32_t offset) {
     LOG_ASSERT_S(rangeInfo, return false, "p_conn_cback range info invalid");
     LOGD("checkOffset: candidate p_conn_cback %p with permissions %d in object file %s",
          *p_nfa_conn_cback, rangeInfo->perms, rangeInfo->label.c_str());
-    LOG_ASSERT_S((rangeInfo->perms & 5) == 5, return false,
-                 "p_conn_cback permissions not read+execute, offset likely invalid");
+    LOG_ASSERT_S((rangeInfo->perms & 1) == 1, return false,
+                 "p_conn_cback permissions not execute, offset likely invalid");
     LOG_ASSERT_S(rangeInfo->label.find("jni") != std::string::npos, return false,
                  "p_conn_cback not in JNI object, offset likely invalid");
 
